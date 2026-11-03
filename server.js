@@ -78,8 +78,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'AI Bridge API is online 🚀' });
 });
 
-// --- ROUTE 2: Add Memory (POST /v1/memory/add) ---
-app.post('/v1/memory/add', verifyApiKey, async (req, res) => {
+// --- ROUTE 2: Add/Store Memory (Handles both /v1/memory/add and /v1/memory/store) ---
+const handleAddMemory = async (req, res) => {
   try {
     const { text, metadata } = req.body;
     if (!text) return res.status(400).json({ error: 'Memory text is required' });
@@ -110,9 +110,12 @@ app.post('/v1/memory/add', verifyApiKey, async (req, res) => {
 
   } catch (err) {
     console.error('Add Memory Error:', err);
-    res.status(500).json({ error: 'Internal server error saving memory' });
+    res.status(500).json({ error: err.message || 'Internal server error saving memory' });
   }
-});
+};
+
+app.post('/v1/memory/add', verifyApiKey, handleAddMemory);
+app.post('/v1/memory/store', verifyApiKey, handleAddMemory);
 
 // --- ROUTE 3: Search Memory (POST /v1/memory/search) ---
 app.post('/v1/memory/search', verifyApiKey, async (req, res) => {
@@ -141,7 +144,7 @@ app.post('/v1/memory/search', verifyApiKey, async (req, res) => {
 
   } catch (err) {
     console.error('Search Memory Error:', err);
-    res.status(500).json({ error: 'Internal server error searching memory' });
+    res.status(500).json({ error: err.message || 'Internal server error searching memory' });
   }
 });
 
