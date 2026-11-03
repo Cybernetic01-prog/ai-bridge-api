@@ -1,302 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Bridge — Vector Memory Gateway</title>
-  
-  <!-- Fonts: Bowlby One SC, Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            bowlby: ['"Bowlby One SC"', 'sans-serif'],
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            surface: {
-              base: '#0B0F17',
-              card: '#111827',
-              border: '#1F2937',
-              input: '#1A2233',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #0B0F17; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #111827; }
-    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bridge Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
 </head>
-<body class="text-slate-200 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8">
 
-  <!-- Top Navbar -->
-  <header class="border-b border-surface-border bg-surface-card/75 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="h-10 w-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg shadow-inner">
-          <i class="fa-solid fa-brain"></i>
-        </div>
-        <div>
-          <h1 class="font-bowlby text-slate-100 text-lg tracking-wider uppercase">AI Bridge</h1>
-          <p class="text-xs text-slate-400 font-medium">Cross-Platform Vector Memory Layer</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-3">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>
-          System Live
-        </span>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Grid Layout -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-    
-    <!-- Left Panel: Controls & Gemini-style Input (7 cols) -->
-    <div class="lg:col-span-7 space-y-6 flex flex-col">
-      
-      <!-- API Key Card -->
-      <div class="p-4 rounded-xl bg-surface-card border border-surface-border shadow-sm flex items-center justify-between gap-4">
-        <div class="flex items-center space-x-3 flex-1">
-          <span class="text-indigo-400 text-sm"><i class="fa-solid fa-key"></i></span>
-          <div class="flex-1">
-            <input type="password" id="authKey" value="sk_live_testkey123" placeholder="API Key (Bearer Token)" 
-              class="w-full bg-transparent text-sm text-slate-100 font-mono focus:outline-none placeholder-slate-500">
-          </div>
-        </div>
-        <button onclick="toggleKeyVisibility()" class="px-3 py-1.5 text-xs font-medium bg-surface-input hover:bg-surface-border border border-surface-border rounded-lg text-slate-300 transition">
-          <i class="fa-solid fa-eye mr-1"></i> Toggle
-        </button>
-      </div>
-
-      <!-- Mode Switcher Tabs -->
-      <div class="flex rounded-xl bg-surface-card border border-surface-border p-1.5 shadow-sm">
-        <button id="tab-search-btn" onclick="switchTab('search')" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-indigo-400 bg-surface-input border border-indigo-500/30 transition flex items-center justify-center space-x-2 shadow-sm">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Recall Memory (Search)</span>
-        </button>
-        <button id="tab-store-btn" onclick="switchTab('store')" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-floppy-disk"></i>
-          <span>Store New Memory</span>
-        </button>
-      </div>
-
-      <!-- Gemini-Style Input Container -->
-      <div class="rounded-2xl bg-surface-card border border-surface-border p-4 shadow-xl flex-1 flex flex-col justify-between transition focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20">
+    <div class="max-w-4xl mx-auto space-y-6">
         
-        <!-- Search Input Mode -->
-        <div id="section-search" class="space-y-4">
-          <div class="flex items-center justify-between px-1">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-2">
-              <i class="fa-solid fa-terminal text-indigo-400"></i>
-              <span>Semantic Search Prompt</span>
-            </label>
-            <div class="flex items-center space-x-2 text-xs text-slate-400 font-mono">
-              <span>Limit:</span>
-              <input type="number" id="searchLimit" value="3" min="1" max="10" 
-                class="w-12 px-2 py-1 bg-surface-input border border-surface-border rounded text-center text-slate-100 font-mono focus:outline-none">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-indigo-400">AI Bridge Vault</h1>
+                <p class="text-slate-400 text-sm">Production-ready vector memory gateway</p>
             </div>
-          </div>
+            <!-- API Key Bar -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <input type="password" id="apiKeyInput" placeholder="Enter Bearer API Key (sk_live_...)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 w-full md:w-80 font-mono">
+                <button onclick="saveApiKey()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Save</button>
+            </div>
+        </header>
 
-          <!-- Gemini-Style Textarea Box -->
-          <div class="relative bg-surface-input rounded-xl border border-surface-border p-3 focus-within:border-indigo-500 transition">
-            <textarea id="searchQuery" rows="4" placeholder="Ask anything, e.g., What was I building with Node.js?" 
-              class="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none font-sans leading-relaxed"></textarea>
-            
-            <div class="flex items-center justify-between pt-3 border-t border-surface-border/60 mt-2">
-              <span class="text-xs text-slate-500 font-mono">Vector Cosine Similarity</span>
-              <button onclick="executeSearch()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
-                <span>Run Query</span>
-                <i class="fa-solid fa-paper-plane"></i>
-              </button>
+        <!-- Register New Key Section -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+            <h2 class="text-lg font-semibold text-slate-200 mb-2">Need an API Key?</h2>
+            <p class="text-sm text-slate-400 mb-4">Register your email to instantly provision a new live API key and user ID.</p>
+            <div class="flex gap-2">
+                <input type="email" id="regEmail" placeholder="user@example.com" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 flex-1">
+                <button onclick="registerKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Register Key</button>
             </div>
-          </div>
+            <div id="regOutput" class="mt-3 hidden text-xs font-mono bg-slate-950 p-3 rounded border border-slate-800 text-emerald-400"></div>
         </div>
 
-        <!-- Store Input Mode (Hidden by default) -->
-        <div id="section-store" class="space-y-4 hidden">
-          <div class="px-1">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center space-x-2">
-              <i class="fa-solid fa-database text-emerald-400"></i>
-              <span>Memory Fact or Note</span>
-            </label>
-          </div>
-
-          <!-- Gemini-Style Textarea Box for Storing -->
-          <div class="relative bg-surface-input rounded-xl border border-surface-border p-3 focus-within:border-emerald-500 transition space-y-3">
-            <textarea id="storeText" rows="3" placeholder="Enter fact to store, e.g., I am building a campus fintech app..." 
-              class="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none font-sans leading-relaxed"></textarea>
+        <!-- Main Grid: Store & Search -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <input type="text" id="storeMetadata" placeholder='Optional Metadata JSON e.g. {"source": "dashboard"}' 
-              class="w-full px-3 py-2 bg-surface-base border border-surface-border rounded-lg text-xs text-slate-300 font-mono placeholder-slate-600 focus:outline-none focus:border-emerald-500">
-
-            <div class="flex items-center justify-between pt-2 border-t border-surface-border/60">
-              <span class="text-xs text-slate-500 font-mono">Gemini Embedding-2 (768D)</span>
-              <button onclick="executeStore()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-lg shadow-lg shadow-emerald-600/30 transition flex items-center space-x-2">
-                <span>Save to Vault</span>
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-              </button>
+            <!-- Store Memory Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200 mb-2">Store Memory</h2>
+                    <p class="text-sm text-slate-400 mb-4">Encrypt and embed text into your vector vault.</p>
+                    <textarea id="memoryText" rows="4" placeholder="Write something memorable..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+                </div>
+                <button onclick="storeMemory()" class="mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-sm font-medium transition">Encrypt & Save</button>
             </div>
-          </div>
+
+            <!-- Search Memory Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200 mb-2">Semantic Search</h2>
+                    <p class="text-sm text-slate-400 mb-4">Query your vector database by meaning.</p>
+                    <input type="text" id="searchQuery" placeholder="Search concept..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 mb-3">
+                </div>
+                <button onclick="searchMemories()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 py-2 rounded-lg text-sm font-medium border border-slate-700 transition">Search Vault</button>
+            </div>
+
         </div>
 
-      </div>
+        <!-- Results Section -->
+        <div id="resultsContainer" class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg hidden">
+            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Search Results</h3>
+            <div id="resultsList" class="space-y-3"></div>
+        </div>
 
     </div>
 
-    <!-- Right Panel: Traffic Light Terminal Console (5 cols) -->
-    <div class="lg:col-span-5 flex flex-col h-full">
-      <div class="rounded-2xl bg-surface-card border border-surface-border flex-1 flex flex-col overflow-hidden shadow-xl min-h-[450px]">
-        
-        <!-- Terminal Traffic Light Header -->
-        <div class="px-4 py-3.5 bg-slate-900/90 border-b border-surface-border flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-rose-500 shadow-sm inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500 shadow-sm inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm inline-block"></span>
-            <span class="ml-3 text-xs font-mono text-slate-400 font-medium">response.json</span>
-          </div>
-          <button onclick="clearConsole()" class="text-xs font-mono text-slate-400 hover:text-slate-200 transition flex items-center space-x-1">
-            <i class="fa-solid fa-rotate-right"></i>
-            <span>Clear</span>
-          </button>
-        </div>
-
-        <!-- Terminal Output Area -->
-        <div class="p-5 flex-1 bg-[#070A10] font-mono text-xs overflow-auto">
-          <pre id="consoleOutput" class="text-emerald-400 leading-relaxed whitespace-pre-wrap">{
-  "status": "idle",
-  "message": "AI Bridge console ready..."
-}</pre>
-        </div>
-
-      </div>
-    </div>
-
-  </main>
-
-  <!-- Script Logic -->
-  <script>
-    const API_BASE = 'https://ai-bridge-api-1.onrender.com';
-
-    function switchTab(tab) {
-      const searchSec = document.getElementById('section-search');
-      const storeSec = document.getElementById('section-store');
-      const searchBtn = document.getElementById('tab-search-btn');
-      const storeBtn = document.getElementById('tab-store-btn');
-
-      if (tab === 'search') {
-        searchSec.classList.remove('hidden');
-        storeSec.classList.add('hidden');
-        searchBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-indigo-400 bg-surface-input border border-indigo-500/30 transition flex items-center justify-center space-x-2 shadow-sm';
-        storeBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-2';
-      } else {
-        storeSec.classList.remove('hidden');
-        searchSec.classList.add('hidden');
-        storeBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-emerald-400 bg-surface-input border border-emerald-500/30 transition flex items-center justify-center space-x-2 shadow-sm';
-        searchBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition flex items-center justify-center space-x-2';
-      }
-    }
-
-    function toggleKeyVisibility() {
-      const input = document.getElementById('authKey');
-      input.type = input.type === 'password' ? 'text' : 'password';
-    }
-
-    function logOutput(data, isError = false) {
-      const output = document.getElementById('consoleOutput');
-      output.className = isError ? 'text-rose-400 leading-relaxed whitespace-pre-wrap' : 'text-emerald-400 leading-relaxed whitespace-pre-wrap';
-      output.textContent = JSON.stringify(data, null, 2);
-    }
-
-    function clearConsole() {
-      logOutput({ status: "idle", message: "Console cleared" });
-    }
-
-    async function executeSearch() {
-      const query = document.getElementById('searchQuery').value.trim();
-      const limit = parseInt(document.getElementById('searchLimit').value) || 3;
-      const key = document.getElementById('authKey').value;
-
-      if (!query) {
-        logOutput({ error: "Please enter a search query." }, true);
-        return;
-      }
-
-      logOutput({ status: "processing", message: "Executing semantic vector search..." });
-
-      try {
-        const res = await fetch(`${API_BASE}/v1/memory/search`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${key}`
-          },
-          body: JSON.stringify({ query, limit })
+    <script>
+        // Load saved API key on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('ai_bridge_key');
+            if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
         });
-        const data = await res.json();
-        logOutput(data, !res.ok);
-      } catch (err) {
-        logOutput({ error: err.message }, true);
-      }
-    }
 
-    async function executeStore() {
-      const text = document.getElementById('storeText').value.trim();
-      const metadataStr = document.getElementById('storeMetadata').value.trim();
-      const key = document.getElementById('authKey').value;
-
-      if (!text) {
-        logOutput({ error: "Please enter memory content to store." }, true);
-        return;
-      }
-
-      let metadata = {};
-      if (metadataStr) {
-        try {
-          metadata = JSON.parse(metadataStr);
-        } catch (e) {
-          logOutput({ error: "Invalid JSON format in metadata field." }, true);
-          return;
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('ai_bridge_key', key);
+                alert('API Key saved locally!');
+            }
         }
-      }
 
-      logOutput({ status: "processing", message: "Generating embeddings & storing to Supabase..." });
+        async function registerKey() {
+            const email = document.getElementById('regEmail').value.trim();
+            const output = document.getElementById('regOutput');
+            if (!email) return alert('Please enter an email address');
 
-      try {
-        const res = await fetch(`${API_BASE}/v1/memory/store`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${key}`
-          },
-          body: JSON.stringify({ text, metadata })
-        });
-        const data = await res.json();
-        logOutput(data, !res.ok);
-      } catch (err) {
-        logOutput({ error: err.message }, true);
-      }
-    }
-  </script>
+            try {
+                const res = await fetch('/v1/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                output.classList.remove('hidden');
+                if (res.ok) {
+                    output.innerHTML = `Success! API Key: <b>${data.api_key}</b><br>User ID: ${data.user_id}`;
+                    document.getElementById('apiKeyInput').value = data.api_key;
+                    localStorage.setItem('ai_bridge_key', data.api_key);
+                } else {
+                    output.innerHTML = `Error: ${data.error}`;
+                }
+            } catch (err) {
+                alert('Request failed: ' + err.message);
+            }
+        }
+
+        async function storeMemory() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            const text = document.getElementById('memoryText').value.trim();
+            if (!key) return alert('Please provide your API key first');
+            if (!text) return alert('Please enter memory text');
+
+            try {
+                const res = await fetch('/v1/memory/add', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Memory saved successfully! ID: ' + data.memory_id);
+                    document.getElementById('memoryText').value = '';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Request failed: ' + err.message);
+            }
+        }
+
+        async function searchMemories() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            const query = document.getElementById('searchQuery').value.trim();
+            if (!key) return alert('Please provide your API key first');
+            if (!query) return alert('Please enter a search query');
+
+            try {
+                const res = await fetch('/v1/memory/search', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({ query, limit: 3 })
+                });
+                const data = await res.json();
+                const container = document.getElementById('resultsContainer');
+                const list = document.getElementById('resultsList');
+                
+                container.classList.remove('hidden');
+                list.innerHTML = '';
+
+                if (res.ok && data.memories.length > 0) {
+                    data.memories.forEach(m => {
+                        const score = (m.score * 100).toFixed(1);
+                        list.innerHTML += `
+                            <div class="bg-slate-950 border border-slate-800 p-3 rounded-lg">
+                                <p class="text-slate-200 text-sm mb-2">${m.text}</p>
+                                <div class="flex justify-between text-xs text-slate-500 font-mono">
+                                    <span>Similarity: ${score}%</span>
+                                    <span>ID: ${m.id}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<p class="text-slate-400 text-sm">No matching memories found.</p>';
+                }
+            } catch (err) {
+                alert('Request failed: ' + err.message);
+            }
+        }
+    </script>
 </body>
 </html>
