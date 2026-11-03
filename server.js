@@ -39,7 +39,6 @@ async function getVectorEmbedding(text) {
     }
   });
 
-  // Handle response structure from the updated @google/genai SDK (`response.embeddings`)
   if (response.embeddings && response.embeddings[0] && response.embeddings[0].values) {
     return response.embeddings[0].values;
   } else if (response.embedding && response.embedding.values) {
@@ -58,7 +57,6 @@ async function verifyApiKey(req, res, next) {
 
   const apiKey = authHeader.split(' ')[1];
 
-  // Lookup API key in Supabase `api_keys` table
   const { data, error } = await supabase
     .from('api_keys')
     .select('user_id, status')
@@ -69,7 +67,7 @@ async function verifyApiKey(req, res, next) {
     return res.status(403).json({ error: 'Invalid, revoked, or unpaid API key' });
   }
 
-  req.userId = data.user_id; // Pass user ID down the line
+  req.userId = data.user_id;
   next();
 }
 
@@ -78,16 +76,50 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'AI Bridge API is online 🚀' });
 });
 
-// --- ROUTE 2: Add/Store Memory (Handles both /v1/memory/add and /v1/memory/store) ---
+// --- ROUTE 2: Register / Generate New API Key ---
+app.post('/v1/auth/register', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
+    // Generate a unique developer API key and user ID
+    const newApiKey = 'sk_live_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const generatedUserId = 'user_' + Math.random().toString(36).substring(2, 9);
+
+    // Insert into Supabase `api_keys` table
+    const { error } = await supabase
+      .from('api_keys')
+      .insert([
+        { 
+          key: newApiKey, 
+          user_id: generatedUserId, 
+          status: 'active' 
+        }
+      ]);
+
+    if (error) throw error;
+
+    res.status(201).json({
+      success: true,
+      message: 'API key generated successfully.',
+      api_key: newApiKey,
+      user_id: generatedUserId
+    });
+
+  } catch (err) {
+    console.error('Registration Error:', err);
+    res.status(500).json({ error: 'Failed to generate API key' });
+  }
+});
+
+// --- ROUTE 3: Add/Store Memory ---
 const handleAddMemory = async (req, res) => {
   try {
     const { text, metadata } = req.body;
     if (!text) return res.status(400).json({ error: 'Memory text is required' });
 
-    // Generate real vector embedding
     const embeddingVector = await getVectorEmbedding(text);
 
-    // Insert into Supabase `memories` table
     const { data, error } = await supabase
       .from('memories')
       .insert([
@@ -117,16 +149,14 @@ const handleAddMemory = async (req, res) => {
 app.post('/v1/memory/add', verifyApiKey, handleAddMemory);
 app.post('/v1/memory/store', verifyApiKey, handleAddMemory);
 
-// --- ROUTE 3: Search Memory (POST /v1/memory/search) ---
+// --- ROUTE 4: Search Memory ---
 app.post('/v1/memory/search', verifyApiKey, async (req, res) => {
   try {
     const { query, limit = 3 } = req.body;
     if (!query) return res.status(400).json({ error: 'Search query is required' });
 
-    // Convert search query into vector
     const queryVector = await getVectorEmbedding(query);
 
-    // Run cosine similarity search in Supabase
     const { data: memories, error } = await supabase.rpc('match_memories', {
       query_embedding: queryVector,
       match_threshold: 0.3,
