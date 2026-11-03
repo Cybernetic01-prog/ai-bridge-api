@@ -1,198 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Bridge | Developer Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Bridge — Vector Memory Gateway</title>
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              900: '#312e81',
+            },
+            surface: {
+              base: '#0B0F17',
+              card: '#111827',
+              border: '#1F2937',
+              input: '#1A2233',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
+    body { font-family: 'Inter', sans-serif; background-color: #0B0F17; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    /* Custom Scrollbar for JSON Terminal */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111827; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+<body class="text-slate-200 min-h-screen flex flex-col">
 
-  <!-- Top Navigation Bar -->
-  <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+  <!-- Top Navbar -->
+  <header class="border-b border-surface-border bg-surface-card/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-        <span class="font-bold text-lg tracking-tight">AI Bridge <span class="text-xs text-emerald-400 font-normal px-2 py-0.5 bg-emerald-950/80 border border-emerald-800/50 rounded-full">v1.0</span></span>
+        <div class="h-8 w-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold font-mono text-sm">
+          ⚡
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-100 text-base tracking-tight">AI Bridge</h1>
+          <p class="text-xs text-slate-400">Cross-Platform Vector Memory Layer</p>
+        </div>
       </div>
-      <div class="text-sm text-slate-400">
-        Status: <span class="text-emerald-400 font-medium">Online (Port 5000)</span>
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          Live Service
+        </span>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="max-w-5xl mx-auto px-6 py-10 flex-grow w-full space-y-8">
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
     
-    <!-- Hero / Intro Section -->
-    <div class="space-y-2">
-      <h1 class="text-3xl font-bold tracking-tight">Developer Dashboard</h1>
-      <p class="text-slate-400 text-sm">Manage your cross-platform memory layer API keys and test real-time vector endpoints.</p>
-    </div>
-
-    <!-- API Key Vault Card -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-6 shadow-xl space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div>
-          <h2 class="font-semibold text-base">Active Developer Credentials</h2>
-          <p class="text-xs text-slate-400">Use this Bearer token to authorize requests to your AI Bridge backend.</p>
-        </div>
-        <button onclick="refreshKeyStatus()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition">
-          Verify Connection
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Your Bearer API Key</label>
-        <div class="flex items-center space-x-3">
-          <input type="password" id="apiKeyInput" value="sk_live_testkey123" readonly 
-            class="mono w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-emerald-400 focus:outline-none">
-          <button onclick="toggleKeyVisibility()" id="toggleBtn" class="bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-sm rounded-lg font-medium transition">
-            Reveal
-          </button>
-          <button onclick="copyApiKey()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-sm rounded-lg font-medium transition text-white">
-            Copy
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Live Testing Playground Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Left Panel: Controls & Input Tabs (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
       
-      <!-- Add Memory Box -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-6 space-y-4 flex flex-col justify-between">
-        <div class="space-y-4">
-          <h2 class="font-semibold text-base border-b border-slate-800 pb-3">1. Add New Memory</h2>
-          <div class="space-y-2">
-            <label class="text-xs text-slate-400">Memory Content / Context</label>
-            <textarea id="memoryText" rows="3" placeholder="e.g., My preferred programming stack is Node.js and Tailwind."
-              class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-indigo-500 text-slate-200 resize-none"></textarea>
-          </div>
+      <!-- API Key Setup Card -->
+      <div class="p-5 rounded-xl bg-surface-card border border-surface-border shadow-sm">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Bearer Token Authorization</label>
+        <div class="flex space-x-2">
+          <input type="password" id="authKey" value="sk_live_testkey123" placeholder="Enter API Key" 
+            class="flex-1 px-3 py-2 bg-surface-input border border-surface-border rounded-lg text-sm text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition">
+          <button onclick="toggleKeyVisibility()" class="px-3 py-2 text-xs font-medium bg-surface-border hover:bg-slate-700 rounded-lg text-slate-300 transition">
+            Show
+          </button>
         </div>
-        <button onclick="addMemory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-lg text-sm transition">
-          Vectorize & Store Memory
-        </button>
       </div>
 
-      <!-- Search Memory Box -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-6 space-y-4 flex flex-col justify-between">
-        <div class="space-y-4">
-          <h2 class="font-semibold text-base border-b border-slate-800 pb-3">2. Semantic Memory Search</h2>
-          <div class="space-y-2">
-            <label class="text-xs text-slate-400">Search Query</label>
-            <input type="text" id="searchQuery" placeholder="e.g., What is my tech stack?"
-              class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:outline-none focus:border-indigo-500 text-slate-200">
-          </div>
+      <!-- Main Interactive Box -->
+      <div class="rounded-xl bg-surface-card border border-surface-border overflow-hidden shadow-md">
+        
+        <!-- Tab Headers -->
+        <div class="flex border-b border-surface-border bg-slate-900/40 p-1">
+          <button id="tab-search-btn" onclick="switchTab('search')" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-indigo-400 bg-surface-card transition">
+            🔍 Recall Memory (Search)
+          </button>
+          <button id="tab-store-btn" onclick="switchTab('store')" class="flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">
+            💾 Store New Memory
+          </button>
         </div>
-        <button onclick="searchMemory()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg text-sm transition">
-          Run Vector Similarity Search
-        </button>
+
+        <!-- Search Tab Content -->
+        <div id="tab-search" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Semantic Query</label>
+            <input type="text" id="searchQuery" placeholder="e.g. What do I love?" 
+              class="w-full px-4 py-2.5 bg-surface-input border border-surface-border rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Result Limit</label>
+            <input type="number" id="searchLimit" value="3" min="1" max="10" 
+              class="w-24 px-3 py-2 bg-surface-input border border-surface-border rounded-lg text-sm text-slate-100 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition">
+          </div>
+          <button onclick="executeSearch()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-lg shadow-lg shadow-indigo-600/20 transition flex items-center justify-center space-x-2">
+            <span>Query Vector Database</span>
+          </button>
+        </div>
+
+        <!-- Store Tab Content -->
+        <div id="tab-store" class="p-6 space-y-4 hidden">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Memory Content</label>
+            <textarea id="storeText" rows="3" placeholder="e.g. i love server.js" 
+              class="w-full px-4 py-2.5 bg-surface-input border border-surface-border rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Optional Metadata (JSON)</label>
+            <input type="text" id="storeMetadata" placeholder='e.g. {"source": "mobile_dashboard"}' 
+              class="w-full px-4 py-2.5 bg-surface-input border border-surface-border rounded-lg text-sm text-slate-100 font-mono placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition">
+          </div>
+          <button onclick="executeStore()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
+            <span>Save Memory Vector</span>
+          </button>
+        </div>
+
       </div>
 
     </div>
 
-    <!-- Output Console Box -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-6 space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Response Console</span>
-        <button onclick="clearConsole()" class="text-xs text-slate-500 hover:text-slate-300">Clear</button>
+    <!-- Right Panel: Live Response Terminal Console (5 cols) -->
+    <div class="lg:col-span-5 flex flex-col h-full">
+      <div class="rounded-xl bg-surface-card border border-surface-border flex-1 flex flex-col overflow-hidden shadow-md min-h-[420px]">
+        
+        <!-- Terminal Header -->
+        <div class="px-4 py-3 bg-slate-900 border-b border-surface-border flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span class="ml-2 text-xs font-mono text-slate-400">response.json</span>
+          </div>
+          <button onclick="clearConsole()" class="text-xs font-mono text-slate-400 hover:text-slate-200 transition">Clear</button>
+        </div>
+
+        <!-- Terminal Output Area -->
+        <div class="p-4 flex-1 bg-[#090D14] font-mono text-xs overflow-auto">
+          <pre id="consoleOutput" class="text-emerald-400 leading-relaxed whitespace-pre-wrap">{
+  "status": "idle",
+  "message": "Awaiting system action..."
+}</pre>
+        </div>
+
       </div>
-      <pre id="consoleOutput" class="mono bg-slate-950 border border-slate-800 rounded-lg p-4 text-xs text-emerald-400 h-40 overflow-y-auto whitespace-pre-wrap">// API responses will appear here...</pre>
     </div>
 
   </main>
 
-  <!-- JavaScript Client Logic -->
   <script>
-    const API_BASE = 'http://localhost:5000';
+    function switchTab(tab) {
+      const searchTab = document.getElementById('tab-search');
+      const storeTab = document.getElementById('tab-store');
+      const searchBtn = document.getElementById('tab-search-btn');
+      const storeBtn = document.getElementById('tab-store-btn');
 
-    function logToConsole(data) {
-      const consoleBox = document.getElementById('consoleOutput');
-      consoleBox.innerText = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      if (tab === 'search') {
+        searchTab.classList.remove('hidden');
+        storeTab.classList.add('hidden');
+        searchBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-indigo-400 bg-surface-card transition';
+        storeBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition';
+      } else {
+        storeTab.classList.remove('hidden');
+        searchTab.classList.add('hidden');
+        storeBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-emerald-400 bg-surface-card transition';
+        searchBtn.className = 'flex-1 py-2.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition';
+      }
     }
 
     function toggleKeyVisibility() {
-      const input = document.getElementById('apiKeyInput');
-      const btn = document.getElementById('toggleBtn');
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = 'Hide';
-      } else {
-        input.type = 'password';
-        btn.innerText = 'Reveal';
-      }
+      const input = document.getElementById('authKey');
+      input.type = input.type === 'password' ? 'text' : 'password';
     }
 
-    async function copyApiKey() {
-      const input = document.getElementById('apiKeyInput');
-      await navigator.clipboard.writeText(input.value);
-      alert('API Key copied to clipboard!');
-    }
-
-    async function refreshKeyStatus() {
-      try {
-        const res = await fetch(`${API_BASE}/`);
-        const data = await res.json();
-        logToConsole(data);
-      } catch (err) {
-        logToConsole({ error: 'Server offline or unreachable.' });
-      }
-    }
-
-    async function addMemory() {
-      const text = document.getElementById('memoryText').value;
-      const apiKey = document.getElementById('apiKeyInput').value;
-      if (!text) return alert('Please enter memory text.');
-
-      logToConsole('Vectorizing and saving memory via Gemini & Supabase...');
-      try {
-        const res = await fetch(`${API_BASE}/v1/memory/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({ text })
-        });
-        const data = await res.json();
-        logToConsole(data);
-      } catch (err) {
-        logToConsole({ error: err.message });
-      }
-    }
-
-    async function searchMemory() {
-      const query = document.getElementById('searchQuery').value;
-      const apiKey = document.getElementById('apiKeyInput').value;
-      if (!query) return alert('Please enter a search query.');
-
-      logToConsole('Running semantic vector search...');
-      try {
-        const res = await fetch(`${API_BASE}/v1/memory/search`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({ query, limit: 3 })
-        });
-        const data = await res.json();
-        logToConsole(data);
-      } catch (err) {
-        logToConsole({ error: err.message });
-      }
+    function logOutput(data, isError = false) {
+      const output = document.getElementById('consoleOutput');
+      output.className = isError ? 'text-rose-400 leading-relaxed whitespace-pre-wrap' : 'text-emerald-400 leading-relaxed whitespace-pre-wrap';
+      output.textContent = JSON.stringify(data, null, 2);
     }
 
     function clearConsole() {
-      document.getElementById('consoleOutput.innerText = "// API responses will appear here..."');
+      logOutput({ status: "idle", message: "Console cleared" });
+    }
+
+    async function executeSearch() {
+      const query = document.getElementById('searchQuery').value.trim();
+      const limit = parseInt(document.getElementById('searchLimit').value) || 3;
+      const key = document.getElementById('authKey').value;
+
+      if (!query) {
+        logOutput({ error: "Please enter a search query." }, true);
+        return;
+      }
+
+      logOutput({ status: "processing", message: "Executing semantic vector search..." });
+
+      try {
+        const res = await fetch('/v1/memory/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({ query, limit })
+        });
+        const data = await res.json();
+        logOutput(data, !res.ok);
+      } catch (err) {
+        logOutput({ error: err.message }, true);
+      }
+    }
+
+    async function executeStore() {
+      const text = document.getElementById('storeText').value.trim();
+      const metadataStr = document.getElementById('storeMetadata').value.trim();
+      const key = document.getElementById('authKey').value;
+
+      if (!text) {
+        logOutput({ error: "Please enter memory content to store." }, true);
+        return;
+      }
+
+      let metadata = {};
+      if (metadataStr) {
+        try {
+          metadata = JSON.parse(metadataStr);
+        } catch (e) {
+          logOutput({ error: "Invalid JSON format in metadata field." }, true);
+          return;
+        }
+      }
+
+      logOutput({ status: "processing", message: "Generating embeddings & storing to Supabase..." });
+
+      try {
+        const res = await fetch('/v1/memory/store', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({ text, metadata })
+        });
+        const data = await res.json();
+        logOutput(data, !res.ok);
+      } catch (err) {
+        logOutput({ error: err.message }, true);
+      }
     }
   </script>
 </body>
