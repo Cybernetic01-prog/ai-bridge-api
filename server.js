@@ -26,7 +26,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// Initialize Google Gemini Free Tier for Vector Embeddings
+// Initialize Google Gemini Client for Vector Embeddings
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Helper: Convert text into a numerical vector using Google's embedding model
@@ -87,15 +87,17 @@ app.post('/v1/auth/register', async (req, res) => {
     const generatedUserId = 'user_' + Math.random().toString(36).substring(2, 9);
 
     // Insert into Supabase `api_keys` table
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('api_keys')
       .insert([
         { 
           key: newApiKey, 
           user_id: generatedUserId, 
-          status: 'active' 
+          status: 'active',
+          email: email
         }
-      ]);
+      ])
+      .select();
 
     if (error) throw error;
 
@@ -108,7 +110,10 @@ app.post('/v1/auth/register', async (req, res) => {
 
   } catch (err) {
     console.error('Registration Error:', err);
-    res.status(500).json({ error: 'Failed to generate API key' });
+    res.status(500).json({ 
+      error: 'Failed to generate API key',
+      details: err.message || err 
+    });
   }
 });
 
