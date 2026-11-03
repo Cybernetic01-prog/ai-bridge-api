@@ -170,6 +170,9 @@
   </main>
 
   <script>
+    // Explicitly point to your live Render backend URL
+    const API_BASE = 'https://ai-bridge-api-1.onrender.com';
+
     function switchTab(tab) {
       const searchTab = document.getElementById('tab-search');
       const storeTab = document.getElementById('tab-store');
@@ -217,7 +220,7 @@
       logOutput({ status: "processing", message: "Executing semantic vector search..." });
 
       try {
-        const res = await fetch('/v1/memory/search', {
+        const res = await fetch(`${API_BASE}/v1/memory/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -255,7 +258,7 @@
       logOutput({ status: "processing", message: "Generating embeddings & storing to Supabase..." });
 
       try {
-        const res = await fetch('/v1/memory/store', {
+        const res = await fetch(`${API_BASE}/v1/memory/store`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
